@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { INITIAL_POSTS, CATEGORIES, TAGS } from './data';
+import { INITIAL_POSTS, CATEGORIES, TAGS } from './posts';
 
 // ===== HEADER =====
 function Header({ page, setPage, onNewPost, scrolled }) {

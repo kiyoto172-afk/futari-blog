@@ -1,0 +1,44 @@
+backend:
+  name: github
+  repo: kiyoto172-afk/futari-blog
+  branch: main
+  base_url: https://futari-blog.pages.dev
+  auth_endpoint: api/auth
+
+media_folder: public/images
+public_folder: /images
+
+locale: ja
+
+site_url: https://futari-blog.pages.dev
+display_url: https://futari-blog.pages.dev
+
+collections:
+  - name: posts
+    label: 記事
+    label_singular: 記事
+    folder: content/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: タイトル, name: title, widget: string }
+      - { label: 一言説明, name: excerpt, widget: string }
+      - label: カテゴリ
+        name: category
+        widget: select
+        options:
+          - 日常
+          - おでかけ
+          - グルメ
+          - 沖縄あれこれ
+      - { label: 公開日, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
+      - { label: アイキャッチ画像, name: image, widget: image }
+      - { label: トップに大きく表示, name: featured, widget: boolean, default: false, required: false }
+      - label: タグ
+        name: tags
+        widget: list
+        required: false
+        default: []
+      - { label: 本文, name: body, widget: markdown }
