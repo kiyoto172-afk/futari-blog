@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { INITIAL_POSTS, CATEGORIES, TAGS } from './posts';
 
 // ===== HEADER =====
-function Header({ page, setPage, onNewPost, scrolled }) {
+function Header({ page, setPage, scrolled }) {
   return (
     <header className={`site-header${scrolled ? ' scrolled' : ''}`}>
       <div className="header-inner">
@@ -17,7 +17,6 @@ function Header({ page, setPage, onNewPost, scrolled }) {
             <li><button className="nav-btn" onClick={() => { setPage('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); }}>わたしたちについて</button></li>
           </ul>
         </nav>
-        <button className="header-cta" onClick={onNewPost}>＋ 新しい記事</button>
       </div>
     </header>
   );
@@ -307,51 +306,6 @@ function ArticlePage({ post, posts, onBack, onPostClick }) {
   );
 }
 
-// ===== NEW POST MODAL =====
-function NewPostModal({ onClose, onSubmit }) {
-  const [form, setForm] = useState({ title: '', category: '日常', excerpt: '', body: '' });
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-  const handleSubmit = () => {
-    if (!form.title || !form.body) return;
-    onSubmit(form);
-    onClose();
-  };
-  return (
-    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">
-        <div className="modal-header">
-          <h2>新しい記事を書く</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
-        </div>
-        <div className="modal-body">
-          <div className="form-group">
-            <label className="form-label">タイトル *</label>
-            <input className="form-input" placeholder="記事のタイトルを入力…" value={form.title} onChange={e => set('title', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">カテゴリ</label>
-            <select className="form-select" value={form.category} onChange={e => set('category', e.target.value)}>
-              {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">一言説明（記事一覧に表示）</label>
-            <input className="form-input" placeholder="短い説明文…" value={form.excerpt} onChange={e => set('excerpt', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">本文 *</label>
-            <textarea className="form-textarea" placeholder="記事の本文を書いてください…" value={form.body} onChange={e => set('body', e.target.value)} />
-          </div>
-          <div className="form-footer">
-            <button className="btn-cancel" onClick={onClose}>キャンセル</button>
-            <button className="btn-submit" onClick={handleSubmit}>投稿する</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ===== FOOTER =====
 function SiteFooter({ setPage }) {
   return (
@@ -383,19 +337,10 @@ function SiteFooter({ setPage }) {
 }
 
 // ===== APP =====
-const IMAGE_POOL = [
-  '/images/cafe-reading.jpg',
-  '/images/couple-drink.jpg',
-  '/images/couple-peace.jpg',
-  '/images/hero-couple.jpg',
-];
-
 export default function App() {
   const [page, setPage] = useState(() => sessionStorage.getItem('oki_page') || 'home');
-  const [posts, setPosts] = useState(INITIAL_POSTS);
+  const [posts] = useState(INITIAL_POSTS);
   const [currentPost, setCurrentPost] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [toast, setToast] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [filterCategory, setFilterCategory] = useState(null);
 
@@ -410,25 +355,6 @@ export default function App() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  const handleNewPost = (form) => {
-    const newPost = {
-      id: Date.now(),
-      ...form,
-      date: new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' }),
-      image: IMAGE_POOL[Math.floor(Math.random() * IMAGE_POOL.length)],
-      featured: false,
-      tags: [form.category, '沖縄'],
-    };
-    setPosts(prev => [newPost, ...prev]);
-    showToastMsg('記事を投稿しました！');
-    setPage('blog');
-  };
-
-  const showToastMsg = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const handlePostClick = (post) => {
     setCurrentPost(post);
     setPage('article');
@@ -441,7 +367,7 @@ export default function App() {
 
   return (
     <>
-      <Header page={page} setPage={setPage} onNewPost={() => setShowModal(true)} scrolled={scrolled} />
+      <Header page={page} setPage={setPage} scrolled={scrolled} />
 
       {page === 'home' && (
         <>
@@ -477,8 +403,6 @@ export default function App() {
         </>
       )}
 
-      {showModal && <NewPostModal onClose={() => setShowModal(false)} onSubmit={handleNewPost} />}
-      {toast && <div className="toast">{toast}</div>}
     </>
   );
 }
